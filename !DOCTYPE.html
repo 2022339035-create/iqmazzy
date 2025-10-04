@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="siteTitle">My Personal Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+        }
+        .quiz-option.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7;
+            border-color: #16a34a;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #dc2626;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 id="navTitle" class="text-2xl font-bold text-gray-800">🌟 My Personal Website</h1>
+                <div class="flex space-x-4">
+                    <button onclick="showSection('home')" class="nav-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        🏠 Home
+                    </button>
+                    <button onclick="showSection('posts')" class="nav-btn bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                        📝 Posts
+                    </button>
+                    <button onclick="showSection('quizzes')" class="nav-btn bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        🧠 Quizzes
+                    </button>
+                    <!-- Secret Admin Access - Triple Click -->
+                    <div id="secretAdminAccess" onclick="handleSecretClick()" class="cursor-pointer">
+                        <span class="text-xs text-gray-400">©</span>
+                    </div>
+                    <!-- Admin Navigation (Hidden by default) -->
+                    <div id="adminNavigation" class="hidden flex space-x-2">
+                        <button onclick="showSection('admin')" class="nav-btn bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            ⚙️ Admin Portal
+                        </button>
+                        <button onclick="exitAdminMode()" class="nav-btn bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            👁️ Public View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <div id="homeSection" class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12 fade-in">
+            <h2 id="welcomeTitle" class="text-5xl font-bold text-gray-800 mb-4">Welcome to My Website! 🎉</h2>
+            <p id="welcomeSubtitle" class="text-xl text-gray-600 mb-8">Explore my posts, take quizzes, and discover amazing content</p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="showSection('posts')" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105">
+                    📖 Read My Posts
+                </button>
+                <button onclick="showSection('quizzes')" class="bg-gradient-to-r from-green-600 to-teal-600 text-white px-8 py-3 rounded-full hover:from-green-700 hover:to-teal-700 transition-all transform hover:scale-105">
+                    🎯 Take a Quiz
+                </button>
+            </div>
+        </div>
+
+        <!-- Featured Content -->
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">📚 Latest Posts</h3>
+                <div id="featuredPosts" class="space-y-3">
+                    <p class="text-gray-500 italic">No posts yet. Create your first post in the Admin section!</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">🏆 Popular Quizzes</h3>
+                <div id="featuredQuizzes" class="space-y-3">
+                    <p class="text-gray-500 italic">No quizzes yet. Create your first quiz in the Admin section!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div id="postsSection" class="hidden container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">📝 My Posts</h2>
+            <p class="text-gray-600">Read my latest thoughts and articles</p>
+        </div>
+        <div id="postsList" class="max-w-4xl mx-auto space-y-6">
+            <div class="text-center py-12">
+                <p class="text-gray-500 text-lg">No posts available yet.</p>
+                <p class="text-gray-400">Check back soon for new content!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quizzes Section -->
+    <div id="quizzesSection" class="hidden container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">🧠 Interactive Quizzes</h2>
+            <p class="text-gray-600">Test your knowledge with my custom quizzes</p>
+        </div>
+        <div id="quizzesList" class="max-w-4xl mx-auto space-y-6">
+            <div class="text-center py-12">
+                <p class="text-gray-500 text-lg">No quizzes available yet.</p>
+                <p class="text-gray-400">Check back soon for new quizzes!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Setup Section (First Time) -->
+    <div id="adminSetupSection" class="hidden container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🔐</div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome, Admin!</h2>
+                <p class="text-gray-600">Set up your admin credentials to secure your website</p>
+            </div>
+            
+            <form onsubmit="setupAdmin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input type="text" id="setupAdminName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Enter your full name..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Email</label>
+                    <input type="email" id="setupAdminEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Password</label>
+                    <input type="password" id="setupAdminPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Create a strong password..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <input type="password" id="setupAdminPasswordConfirm" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Confirm your password..." required>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-800 mb-2">🛡️ Security Notice</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• Use a strong, unique password</li>
+                        <li>• Keep your credentials safe</li>
+                        <li>• You can add moderators later</li>
+                    </ul>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    🚀 Complete Setup & Enter Admin Portal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Section -->
+    <div id="adminSection" class="hidden container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">⚙️ Admin Portal</h2>
+            <p class="text-gray-600">Manage your website content and settings</p>
+            <div class="mt-4 bg-green-100 border border-green-300 rounded-lg p-3 inline-block">
+                <span class="text-green-800">👋 Welcome back, <span id="adminWelcomeName">Admin</span>!</span>
+            </div>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-center mb-8 space-x-2 flex-wrap gap-2">
+                <button onclick="showAdminTab('customize')" class="admin-tab-btn bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                    🎨 Customize
+                </button>
+                <button onclick="showAdminTab('posts')" class="admin-tab-btn bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    📝 Manage Posts
+                </button>
+                <button onclick="showAdminTab('quizzes')" class="admin-tab-btn bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    🧠 Manage Quizzes
+                </button>
+                <button onclick="showAdminTab('moderators')" class="admin-tab-btn bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors" id="moderatorTabBtn">
+                    👥 Moderators
+                </button>
+            </div>
+
+            <!-- Customize Tab -->
+            <div id="customizeTab" class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">🎨 Customize Your Website</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Website Title</label>
+                            <input type="text" id="customWebsiteTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="My Personal Website">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Welcome Message</label>
+                            <input type="text" id="customWelcomeTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Welcome to My Website!">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
+                            <input type="text" id="customWelcomeSubtitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Explore my posts, take quizzes...">
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Choose Theme Color</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="setTheme('blue')" class="w-12 h-12 bg-blue-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('purple')" class="w-12 h-12 bg-purple-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('green')" class="w-12 h-12 bg-green-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('red')" class="w-12 h-12 bg-red-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('yellow')" class="w-12 h-12 bg-yellow-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('pink')" class="w-12 h-12 bg-pink-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('indigo')" class="w-12 h-12 bg-indigo-500 rounded-lg hover:scale-110 transition-transform"></button>
+                                <button onclick="setTheme('teal')" class="w-12 h-12 bg-teal-500 rounded-lg hover:scale-110 transition-transform"></button>
+                            </div>
+                        </div>
+                        <button onclick="applyCustomization()" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                            ✨ Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Management Tab -->
+            <div id="postsTab" class="hidden bg-white rounded-xl shadow-lg p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">📝 Manage Posts</h3>
+                    <button onclick="showCreatePost()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        ➕ Create New Post
+                    </button>
+                </div>
+                <div id="adminPostsList" class="space-y-4">
+                    <p class="text-gray-500 italic">No posts created yet. Click "Create New Post" to get started!</p>
+                </div>
+            </div>
+
+            <!-- Quizzes Management Tab -->
+            <div id="quizzesTab" class="hidden bg-white rounded-xl shadow-lg p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">🧠 Manage Quizzes</h3>
+                    <button onclick="showCreateQuiz()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        ➕ Create New Quiz
+                    </button>
+                </div>
+                <div id="adminQuizzesList" class="space-y-4">
+                    <p class="text-gray-500 italic">No quizzes created yet. Click "Create New Quiz" to get started!</p>
+                </div>
+            </div>
+
+            <!-- Moderators Management Tab -->
+            <div id="moderatorsTab" class="hidden bg-white rounded-xl shadow-lg p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">👥 Manage Moderators</h3>
+                    <button onclick="showAddModerator()" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors">
+                        ➕ Add Moderator
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-2">👑 Super Admin</h4>
+                        <p class="text-blue-700" id="superAdminInfo">admin@example.com (You)</p>
+                    </div>
+                </div>
+                <div id="moderatorsList" class="space-y-4">
+                    <p class="text-gray-500 italic">No moderators added yet. Click "Add Moderator" to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">✍️ Create New Post</h3>
+                <button onclick="closeCreatePost()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Post Title</label>
+                    <input type="text" id="postTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Enter post title...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select id="postCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option>Technology</option>
+                        <option>Lifestyle</option>
+                        <option>Education</option>
+                        <option>Business</option>
+                        <option>Health</option>
+                        <option>Travel</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <textarea id="postContent" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Write your post content here..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
+                    <input type="text" id="postTags" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="tag1, tag2, tag3">
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="savePost()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        💾 Save Post
+                    </button>
+                    <button onclick="closeCreatePost()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Quiz Modal -->
+    <div id="createQuizModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">🧠 Create New Quiz</h3>
+                <button onclick="closeCreateQuiz()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Title</label>
+                        <input type="text" id="quizTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Enter quiz title...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <input type="text" id="quizCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Math, Science, etc.">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="quizDescription" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Brief description of your quiz..."></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Questions</label>
+                        <button type="button" onclick="addQuizQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                            + Add Question
+                        </button>
+                    </div>
+                    <div id="quizQuestionsList" class="space-y-4 max-h-60 overflow-y-auto">
+                        <!-- Questions will be added here -->
+                    </div>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="saveQuiz()" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        💾 Save Quiz
+                    </button>
+                    <button onclick="closeCreateQuiz()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Take Quiz Modal -->
+    <div id="takeQuizModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="currentQuizTitle" class="text-2xl font-bold text-gray-800">Quiz Title</h3>
+                <button onclick="closeTakeQuiz()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <!-- Quiz Progress -->
+            <div class="mb-6">
+                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">5</span></span>
+                    <span>Time: <span id="quizTimer">00:00</span></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="quizProgress" class="progress-bar bg-green-600 h-2 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Content -->
+            <div id="quizContent">
+                <!-- Quiz questions will be loaded here -->
+            </div>
+
+            <!-- Quiz Navigation -->
+            <div class="flex justify-between pt-6">
+                <button id="prevQuestionBtn" onclick="previousQuestion()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors" disabled>
+                    ← Previous
+                </button>
+                <button id="nextQuestionBtn" onclick="nextQuestion()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    Next →
+                </button>
+                <button id="finishQuizBtn" onclick="finishQuiz()" class="hidden bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    🏁 Finish Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Results Modal -->
+    <div id="quizResultsModal" class="modal">
+        <div class="modal-content">
+            <div class="text-center">
+                <div class="text-6xl mb-4" id="resultEmoji">🎉</div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h3>
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl p-6 mb-6">
+                    <div class="text-4xl font-bold mb-2" id="finalScore">85%</div>
+                    <div class="text-lg" id="scoreMessage">Excellent work!</div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-6 text-center">
+                    <div class="bg-green-100 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-green-600" id="correctAnswers">8</div>
+                        <div class="text-sm text-gray-600">Correct</div>
+                    </div>
+                    <div class="bg-red-100 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-red-600" id="incorrectAnswers">2</div>
+                        <div class="text-sm text-gray-600">Incorrect</div>
+                    </div>
+                    <div class="bg-blue-100 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-blue-600" id="timeTaken">05:23</div>
+                        <div class="text-sm text-gray-600">Time</div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <button onclick="reviewAnswers()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        📋 Review Answers
+                    </button>
+                    <button onclick="closeQuizResults()" class="w-full bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Security Challenge Modal -->
+    <div id="adminSecurityModal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4">🛡️</div>
+                <h3 class="text-2xl font-bold text-red-600">SECURITY ALERT</h3>
+                <p class="text-gray-600 mt-2">Admin system already configured!</p>
+            </div>
+            
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <h4 class="font-semibold text-red-800 mb-2">⚠️ Access Restricted</h4>
+                <p class="text-red-700 text-sm mb-3">This website already has an admin:</p>
+                <div class="bg-white rounded p-3 border">
+                    <p class="font-medium text-gray-800" id="securityAdminName">Admin Name</p>
+                    <p class="text-sm text-gray-600" id="securityAdminEmail">admin@email.com</p>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <h4 class="font-semibold text-yellow-800 mb-2">🔐 Are You The Admin?</h4>
+                <p class="text-yellow-700 text-sm">If you are the legitimate admin, please confirm your identity:</p>
+            </div>
+            
+            <form onsubmit="handleSecurityChallenge(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Email</label>
+                    <input type="email" id="securityEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Enter your admin email..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Password</label>
+                    <input type="password" id="securityPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Enter your admin password..." required>
+                </div>
+                <div id="securityError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    ❌ Invalid credentials! Access denied.
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors">
+                        🔓 Verify & Enter
+                    </button>
+                    <button type="button" onclick="closeSecurityChallenge()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-500">
+                    🛡️ This security measure protects your website from unauthorized access
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Moderator Modal -->
+    <div id="addModeratorModal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">👥 Add New Moderator</h3>
+                <button onclick="closeAddModerator()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <form onsubmit="handleAddModerator(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Moderator Name</label>
+                    <input type="text" id="moderatorName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="Enter full name..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="moderatorEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="Enter email address..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Temporary Password</label>
+                    <input type="password" id="moderatorPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="Create temporary password..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="canManagePosts" class="mr-2" checked>
+                            <span class="text-sm">Can manage posts</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="canManageQuizzes" class="mr-2" checked>
+                            <span class="text-sm">Can manage quizzes</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="canCustomize" class="mr-2">
+                            <span class="text-sm">Can customize website</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p class="text-sm text-yellow-800">
+                        <strong>Note:</strong> The moderator will receive their login credentials and must change their password on first login.
+                    </p>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors">
+                        ➕ Add Moderator
+                    </button>
+                    <button type="button" onclick="closeAddModerator()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let posts = JSON.parse(localStorage.getItem('websitePosts') || '[]');
+        let quizzes = JSON.parse(localStorage.getItem('websiteQuizzes') || '[]');
+        let customization = JSON.parse(localStorage.getItem('websiteCustomization') || '{}');
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizStartTime = null;
+        let quizTimer = null;
+        let questionCounter = 0;
+        
+        // Authentication variables
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let users = JSON.parse(localStorage.getItem('websiteUsers') || '[]');
+        let moderators = JSON.parse(localStorage.getItem('websiteModerators') || '[]');
+        let adminSetupComplete = localStorage.getItem('adminSetupComplete') === 'true';
+        
+        // Secret admin access
+        let secretClickCount = 0;
+        let secretClickTimer = null;
+
+        // Initialize website
+        function initWebsite() {
+            loadCustomization();
+            updateFeaturedContent();
+            updatePostsList();
+            updateQuizzesList();
+            updateAdminLists();
+            updateAuthUI();
+            showSection('home');
+        }
+
+        // Secret Admin Access Functions
+        function handleSecretClick() {
+            secretClickCount++;
+            
+            if (secretClickTimer) {
+                clearTimeout(secretClickTimer);
+            }
+            
+            // Reset counter after 2 seconds
+            secretClickTimer = setTimeout(() => {
+                secretClickCount = 0;
+            }, 2000);
+            
+            // Triple click detected
+            if (secretClickCount === 3) {
+                secretClickCount = 0;
+                clearTimeout(secretClickTimer);
+                
+                // SECURITY: Check if admin setup was ever completed
+                if (!adminSetupComplete && users.length === 0) {
+                    // First time setup - ONLY if truly no admin exists
+                    showSection('adminSetup');
+                } else if (currentUser && currentUser.role === 'admin') {
+                    // Already logged in admin
+                    showSection('admin');
+                } else {
+                    // SECURITY: Admin already exists, require proper authentication
+                    showAdminSecurityChallenge();
+                }
+            }
+        }
+
+        // Security challenge for existing admin system
+        function showAdminSecurityChallenge() {
+            const adminUser = users.find(u => u.role === 'admin');
+            if (!adminUser) {
+                showNotification('System error: No admin found! 🚨', 'error');
+                return;
+            }
+            
+            // Show security confirmation modal
+            document.getElementById('adminSecurityModal').style.display = 'block';
+            document.getElementById('securityAdminName').textContent = adminUser.name;
+            document.getElementById('securityAdminEmail').textContent = adminUser.email;
+            document.getElementById('securityError').classList.add('hidden');
+        }
+
+        function closeSecurityChallenge() {
+            document.getElementById('adminSecurityModal').style.display = 'none';
+            document.getElementById('securityEmail').value = '';
+            document.getElementById('securityPassword').value = '';
+            document.getElementById('securityError').classList.add('hidden');
+        }
+
+        function handleSecurityChallenge(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('securityEmail').value.trim();
+            const password = document.getElementById('securityPassword').value;
+            
+            // SECURITY: Only verify against the EXISTING admin - NO new accounts allowed
+            const existingAdmin = users.find(u => u.role === 'admin');
+            
+            if (!existingAdmin) {
+                document.getElementById('securityError').classList.remove('hidden');
+                document.getElementById('securityError').textContent = '❌ System error: No admin found!';
+                showNotification('System error: No admin configured! 🚨', 'error');
+                return;
+            }
+            
+            // STRICT verification: Must match EXACTLY the existing admin credentials
+            if (email === existingAdmin.email && password === existingAdmin.password) {
+                // SUCCESS: Valid admin login
+                currentUser = existingAdmin;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateAuthUI();
+                closeSecurityChallenge();
+                showNotification(`Security verified! Welcome back, ${existingAdmin.name}! 🛡️`, 'success');
+                showSection('admin');
+            } else {
+                // FAILURE: Invalid credentials - NO NEW ACCOUNT CREATION
+                document.getElementById('securityError').classList.remove('hidden');
+                document.getElementById('securityError').textContent = '❌ Invalid credentials! Access denied.';
+                showNotification('Access denied! Invalid admin credentials. 🚨', 'error');
+                
+                // Security log (in real app, this would be logged)
+                console.warn('Failed admin login attempt:', { 
+                    attemptedEmail: email, 
+                    realAdmin: existingAdmin.email,
+                    timestamp: new Date().toISOString() 
+                });
+                
+                // CRITICAL: Clear the form to prevent further attempts
+                document.getElementById('securityEmail').value = '';
+                document.getElementById('securityPassword').value = '';
+            }
+        }
+
+        // Admin Setup Functions
+        function setupAdmin(event) {
+            event.preventDefault();
+            
+            // CRITICAL SECURITY CHECK: Prevent multiple admin setup
+            if (adminSetupComplete || users.some(u => u.role === 'admin')) {
+                showNotification('SECURITY VIOLATION: Admin already exists! 🚨', 'error');
+                console.error('SECURITY ALERT: Attempted admin setup when admin already exists!');
+                showSection('home'); // Redirect away from setup
+                return;
+            }
+            
+            const name = document.getElementById('setupAdminName').value.trim();
+            const email = document.getElementById('setupAdminEmail').value.trim();
+            const password = document.getElementById('setupAdminPassword').value;
+            const confirmPassword = document.getElementById('setupAdminPasswordConfirm').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match! 🔒', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters! 🔒', 'error');
+                return;
+            }
+            
+            // Create THE ONLY admin user (first and last)
+            const admin = {
+                id: 1,
+                name: name,
+                email: email,
+                password: password,
+                role: 'admin',
+                createdAt: new Date().toISOString(),
+                isOriginalAdmin: true // Mark as the original admin
+            };
+            
+            users = [admin]; // Replace any existing users
+            moderators = [];
+            currentUser = admin;
+            adminSetupComplete = true;
+            
+            localStorage.setItem('websiteUsers', JSON.stringify(users));
+            localStorage.setItem('websiteModerators', JSON.stringify(moderators));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('adminSetupComplete', 'true');
+            
+            updateAuthUI();
+            showNotification(`Welcome ${name}! Your admin portal is ready! 🎉`, 'success');
+            showSection('admin');
+        }
+
+        // Authentication functions
+        function updateAuthUI() {
+            const adminNavigation = document.getElementById('adminNavigation');
+            const moderatorTabBtn = document.getElementById('moderatorTabBtn');
+            
+            if (currentUser && currentUser.role === 'admin') {
+                adminNavigation.classList.remove('hidden');
+                
+                // Update welcome message
+                if (document.getElementById('adminWelcomeName')) {
+                    document.getElementById('adminWelcomeName').textContent = currentUser.name;
+                }
+                
+                // Show moderator tab only for super admin
+                if (moderatorTabBtn) {
+                    moderatorTabBtn.classList.remove('hidden');
+                }
+                
+                if (document.getElementById('superAdminInfo')) {
+                    document.getElementById('superAdminInfo').textContent = `${currentUser.email} (You)`;
+                }
+            } else {
+                adminNavigation.classList.add('hidden');
+                if (moderatorTabBtn) {
+                    moderatorTabBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        function exitAdminMode() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            showSection('home');
+            showNotification('Returned to public view! 👁️', 'success');
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Check if user is trying to access admin without proper authentication
+            if (section === 'admin' && (!currentUser || currentUser.role !== 'admin')) {
+                showNotification('Access denied! Admin credentials required. 🔐', 'error');
+                return;
+            }
+            
+            // Hide all sections
+            document.querySelectorAll('[id$="Section"]').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-white');
+            });
+            if (event && event.target) {
+                event.target.classList.add('ring-2', 'ring-white');
+            }
+        }
+
+        // Moderator Management
+        function showAddModerator() {
+            if (currentUser?.role !== 'admin') {
+                showNotification('Only super admin can add moderators! ⚠️', 'error');
+                return;
+            }
+            document.getElementById('addModeratorModal').style.display = 'block';
+            // Clear form
+            document.getElementById('moderatorName').value = '';
+            document.getElementById('moderatorEmail').value = '';
+            document.getElementById('moderatorPassword').value = '';
+            document.getElementById('canManagePosts').checked = true;
+            document.getElementById('canManageQuizzes').checked = true;
+            document.getElementById('canCustomize').checked = false;
+        }
+
+        function closeAddModerator() {
+            document.getElementById('addModeratorModal').style.display = 'none';
+        }
+
+        function handleAddModerator(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('moderatorName').value.trim();
+            const email = document.getElementById('moderatorEmail').value.trim();
+            const password = document.getElementById('moderatorPassword').value;
+            const canManagePosts = document.getElementById('canManagePosts').checked;
+            const canManageQuizzes = document.getElementById('canManageQuizzes').checked;
+            const canCustomize = document.getElementById('canCustomize').checked;
+            
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                showNotification('Email already exists! Please use a different email. ⚠️', 'error');
+                return;
+            }
+            
+            // Create new moderator
+            const moderator = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: 'moderator',
+                permissions: {
+                    canManagePosts,
+                    canManageQuizzes,
+                    canCustomize
+                },
+                createdAt: new Date().toISOString(),
+                createdBy: currentUser.email,
+                mustChangePassword: true
+            };
+            
+            users.push(moderator);
+            moderators.push(moderator);
+            
+            localStorage.setItem('websiteUsers', JSON.stringify(users));
+            localStorage.setItem('websiteModerators', JSON.stringify(moderators));
+            
+            updateModeratorsList();
+            closeAddModerator();
+            showNotification(`Moderator ${name} added successfully! 👥`, 'success');
+        }
+
+        function removeModerator(id) {
+            if (currentUser?.role !== 'admin') {
+                showNotification('Only super admin can remove moderators! ⚠️', 'error');
+                return;
+            }
+            
+            const moderator = moderators.find(m => m.id === id);
+            if (!moderator) return;
+            
+            if (confirm(`Are you sure you want to remove moderator "${moderator.name}"?`)) {
+                users = users.filter(u => u.id !== id);
+                moderators = moderators.filter(m => m.id !== id);
+                
+                localStorage.setItem('websiteUsers', JSON.stringify(users));
+                localStorage.setItem('websiteModerators', JSON.stringify(moderators));
+                
+                updateModeratorsList();
+                showNotification(`Moderator ${moderator.name} removed successfully! 🗑️`, 'success');
+            }
+        }
+
+        // Admin tabs
+        function showAdminTab(tab) {
+            document.querySelectorAll('[id$="Tab"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-white');
+            });
+            event.target.classList.add('ring-2', 'ring-white');
+        }
+
+        // Customization
+        function loadCustomization() {
+            if (customization.title) {
+                document.getElementById('siteTitle').textContent = customization.title;
+                document.getElementById('navTitle').textContent = '🌟 ' + customization.title;
+                document.getElementById('customWebsiteTitle').value = customization.title;
+            }
+            if (customization.welcomeTitle) {
+                document.getElementById('welcomeTitle').textContent = customization.welcomeTitle;
+                document.getElementById('customWelcomeTitle').value = customization.welcomeTitle;
+            }
+            if (customization.welcomeSubtitle) {
+                document.getElementById('welcomeSubtitle').textContent = customization.welcomeSubtitle;
+                document.getElementById('customWelcomeSubtitle').value = customization.welcomeSubtitle;
+            }
+        }
+
+        function setTheme(color) {
+            // Visual feedback for theme selection
+            document.querySelectorAll('[onclick^="setTheme"]').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-gray-400');
+            });
+            event.target.classList.add('ring-4', 'ring-gray-400');
+            customization.theme = color;
+        }
+
+        function applyCustomization() {
+            const title = document.getElementById('customWebsiteTitle').value.trim();
+            const welcomeTitle = document.getElementById('customWelcomeTitle').value.trim();
+            const welcomeSubtitle = document.getElementById('customWelcomeSubtitle').value.trim();
+
+            if (title) {
+                customization.title = title;
+                document.getElementById('siteTitle').textContent = title;
+                document.getElementById('navTitle').textContent = '🌟 ' + title;
+            }
+            if (welcomeTitle) {
+                customization.welcomeTitle = welcomeTitle;
+                document.getElementById('welcomeTitle').textContent = welcomeTitle;
+            }
+            if (welcomeSubtitle) {
+                customization.welcomeSubtitle = welcomeSubtitle;
+                document.getElementById('welcomeSubtitle').textContent = welcomeSubtitle;
+            }
+
+            localStorage.setItem('websiteCustomization', JSON.stringify(customization));
+            showNotification('Website customized successfully! ✨', 'success');
+        }
+
+        // Posts Management
+        function showCreatePost() {
+            if (!currentUser) {
+                showNotification('Please login to create posts! 🔐', 'error');
+                return;
+            }
+            if (currentUser.role === 'moderator' && !currentUser.permissions?.canManagePosts) {
+                showNotification('You don\'t have permission to manage posts! ⚠️', 'error');
+                return;
+            }
+            document.getElementById('createPostModal').style.display = 'block';
+            // Clear form
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postTags').value = '';
+        }
+
+        function closeCreatePost() {
+            document.getElementById('createPostModal').style.display = 'none';
+        }
+
+        function savePost() {
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const content = document.getElementById('postContent').value.trim();
+            const tags = document.getElementById('postTags').value.trim();
+
+            if (!title || !content) {
+                showNotification('Please fill in title and content!', 'error');
+                return;
+            }
+
+            const post = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                content: content,
+                tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                date: new Date().toLocaleDateString(),
+                timestamp: new Date().toLocaleString()
+            };
+
+            posts.unshift(post);
+            localStorage.setItem('websitePosts', JSON.stringify(posts));
+            
+            updatePostsList();
+            updateFeaturedContent();
+            updateAdminLists();
+            closeCreatePost();
+            showNotification('Post created successfully! 📝', 'success');
+        }
+
+        function deletePost(id) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                posts = posts.filter(post => post.id !== id);
+                localStorage.setItem('websitePosts', JSON.stringify(posts));
+                updatePostsList();
+                updateFeaturedContent();
+                updateAdminLists();
+                showNotification('Post deleted successfully! 🗑️', 'success');
+            }
+        }
+
+        // Quiz Management
+        function showCreateQuiz() {
+            if (!currentUser) {
+                showNotification('Please login to create quizzes! 🔐', 'error');
+                return;
+            }
+            if (currentUser.role === 'moderator' && !currentUser.permissions?.canManageQuizzes) {
+                showNotification('You don\'t have permission to manage quizzes! ⚠️', 'error');
+                return;
+            }
+            document.getElementById('createQuizModal').style.display = 'block';
+            // Clear form
+            document.getElementById('quizTitle').value = '';
+            document.getElementById('quizCategory').value = '';
+            document.getElementById('quizDescription').value = '';
+            document.getElementById('quizQuestionsList').innerHTML = '';
+            questionCounter = 0;
+            addQuizQuestion(); // Add first question
+        }
+
+        function closeCreateQuiz() {
+            document.getElementById('createQuizModal').style.display = 'none';
+        }
+
+        function addQuizQuestion() {
+            questionCounter++;
+            const questionsList = document.getElementById('quizQuestionsList');
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'bg-gray-50 p-4 rounded-lg';
+            questionDiv.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-800">Question ${questionCounter}</h4>
+                    <button type="button" onclick="removeQuizQuestion(this)" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <input type="text" class="question-text w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500" placeholder="Enter your question...">
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct_${questionCounter}" value="0" class="text-green-600">
+                            <span class="text-sm font-medium">A)</span>
+                            <input type="text" class="option-text flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500" placeholder="Option A">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct_${questionCounter}" value="1" class="text-green-600">
+                            <span class="text-sm font-medium">B)</span>
+                            <input type="text" class="option-text flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500" placeholder="Option B">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct_${questionCounter}" value="2" class="text-green-600">
+                            <span class="text-sm font-medium">C)</span>
+                            <input type="text" class="option-text flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500" placeholder="Option C">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct_${questionCounter}" value="3" class="text-green-600">
+                            <span class="text-sm font-medium">D)</span>
+                            <input type="text" class="option-text flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500" placeholder="Option D">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500">Select the radio button next to the correct answer</p>
+                </div>
+            `;
+            questionsList.appendChild(questionDiv);
+        }
+
+        function removeQuizQuestion(button) {
+            button.closest('.bg-gray-50').remove();
+        }
+
+        function saveQuiz() {
+            const title = document.getElementById('quizTitle').value.trim();
+            const category = document.getElementById('quizCategory').value.trim();
+            const description = document.getElementById('quizDescription').value.trim();
+
+            if (!title || !category) {
+                showNotification('Please fill in title and category!', 'error');
+                return;
+            }
+
+            // Collect questions
+            const questionDivs = document.querySelectorAll('#quizQuestionsList .bg-gray-50');
+            const questions = [];
+
+            questionDivs.forEach((div, index) => {
+                const questionText = div.querySelector('.question-text').value.trim();
+                const options = Array.from(div.querySelectorAll('.option-text')).map(input => input.value.trim());
+                const correctAnswer = div.querySelector(`input[name="correct_${index + 1}"]:checked`);
+
+                if (questionText && options.every(opt => opt) && correctAnswer) {
+                    questions.push({
+                        question: questionText,
+                        options: options,
+                        correct: parseInt(correctAnswer.value)
+                    });
+                }
+            });
+
+            if (questions.length === 0) {
+                showNotification('Please add at least one complete question!', 'error');
+                return;
+            }
+
+            const quiz = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                description: description,
+                questions: questions,
+                date: new Date().toLocaleDateString(),
+                timestamp: new Date().toLocaleString()
+            };
+
+            quizzes.unshift(quiz);
+            localStorage.setItem('websiteQuizzes', JSON.stringify(quizzes));
+            
+            updateQuizzesList();
+            updateFeaturedContent();
+            updateAdminLists();
+            closeCreateQuiz();
+            showNotification('Quiz created successfully! 🧠', 'success');
+        }
+
+        function deleteQuiz(id) {
+            if (confirm('Are you sure you want to delete this quiz?')) {
+                quizzes = quizzes.filter(quiz => quiz.id !== id);
+                localStorage.setItem('websiteQuizzes', JSON.stringify(quizzes));
+                updateQuizzesList();
+                updateFeaturedContent();
+                updateAdminLists();
+                showNotification('Quiz deleted successfully! 🗑️', 'success');
+            }
+        }
+
+        // Taking Quiz
+        function startQuiz(id) {
+            currentQuiz = quizzes.find(quiz => quiz.id === id);
+            if (!currentQuiz) return;
+
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentQuiz.questions.length).fill(null);
+            quizStartTime = Date.now();
+            
+            document.getElementById('takeQuizModal').style.display = 'block';
+            document.getElementById('currentQuizTitle').textContent = currentQuiz.title;
+            document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
+            
+            startQuizTimer();
+            showQuestion();
+        }
+
+        function startQuizTimer() {
+            quizTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - quizStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('quizTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function showQuestion() {
+            const question = currentQuiz.questions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
+            
+            document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('quizProgress').style.width = progress + '%';
+            
+            const quizContent = document.getElementById('quizContent');
+            quizContent.innerHTML = `
+                <div class="mb-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4">${question.question}</h4>
+                    <div class="space-y-3">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50" onclick="selectAnswer(${index})">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 border-2 border-gray-300 rounded-full mr-3 flex items-center justify-center">
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full hidden answer-dot"></div>
+                                    </div>
+                                    <span class="text-gray-800">${String.fromCharCode(65 + index)}) ${option}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Show previous answer if exists
+            if (userAnswers[currentQuestionIndex] !== null) {
+                selectAnswer(userAnswers[currentQuestionIndex], false);
+            }
+
+            // Update navigation buttons
+            document.getElementById('prevQuestionBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextQuestionBtn').style.display = 
+                currentQuestionIndex === currentQuiz.questions.length - 1 ? 'none' : 'block';
+            document.getElementById('finishQuizBtn').style.display = 
+                currentQuestionIndex === currentQuiz.questions.length - 1 ? 'block' : 'none';
+        }
+
+        function selectAnswer(answerIndex, save = true) {
+            // Remove previous selection
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+                option.querySelector('.answer-dot').classList.add('hidden');
+            });
+
+            // Add new selection
+            const selectedOption = document.querySelectorAll('.quiz-option')[answerIndex];
+            selectedOption.classList.add('selected');
+            selectedOption.querySelector('.answer-dot').classList.remove('hidden');
+
+            if (save) {
+                userAnswers[currentQuestionIndex] = answerIndex;
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(quizTimer);
+            const totalTime = Math.floor((Date.now() - quizStartTime) / 1000);
+            
+            // Calculate results
+            let correctCount = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === currentQuiz.questions[index].correct) {
+                    correctCount++;
+                }
+            });
+
+            const percentage = Math.round((correctCount / currentQuiz.questions.length) * 100);
+            
+            // Show results
+            document.getElementById('takeQuizModal').style.display = 'none';
+            showQuizResults(correctCount, currentQuiz.questions.length - correctCount, percentage, totalTime);
+        }
+
+        function showQuizResults(correct, incorrect, percentage, timeSeconds) {
+            const minutes = Math.floor(timeSeconds / 60);
+            const seconds = timeSeconds % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Set emoji and message based on score
+            let emoji, message;
+            if (percentage >= 90) {
+                emoji = '🏆';
+                message = 'Outstanding! You\'re a genius!';
+            } else if (percentage >= 80) {
+                emoji = '🎉';
+                message = 'Excellent work! Well done!';
+            } else if (percentage >= 70) {
+                emoji = '👏';
+                message = 'Good job! Keep it up!';
+            } else if (percentage >= 60) {
+                emoji = '👍';
+                message = 'Not bad! Room for improvement.';
+            } else {
+                emoji = '📚';
+                message = 'Keep studying! You\'ll do better next time.';
+            }
+
+            document.getElementById('resultEmoji').textContent = emoji;
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('scoreMessage').textContent = message;
+            document.getElementById('correctAnswers').textContent = correct;
+            document.getElementById('incorrectAnswers').textContent = incorrect;
+            document.getElementById('timeTaken').textContent = timeString;
+
+            document.getElementById('quizResultsModal').style.display = 'block';
+        }
+
+        function reviewAnswers() {
+            document.getElementById('quizResultsModal').style.display = 'none';
+            document.getElementById('takeQuizModal').style.display = 'block';
+            
+            // Show review mode
+            showReviewMode();
+        }
+
+        function showReviewMode() {
+            const quizContent = document.getElementById('quizContent');
+            let reviewHTML = '<div class="space-y-6">';
+            
+            currentQuiz.questions.forEach((question, qIndex) => {
+                const userAnswer = userAnswers[qIndex];
+                const isCorrect = userAnswer === question.correct;
+                
+                reviewHTML += `
+                    <div class="border rounded-lg p-4 ${isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}">
+                        <div class="flex items-center mb-3">
+                            <span class="text-lg ${isCorrect ? 'text-green-600' : 'text-red-600'}">${isCorrect ? '✅' : '❌'}</span>
+                            <h4 class="text-lg font-semibold text-gray-800 ml-2">Question ${qIndex + 1}</h4>
+                        </div>
+                        <p class="text-gray-800 mb-3">${question.question}</p>
+                        <div class="space-y-2">
+                            ${question.options.map((option, oIndex) => {
+                                let optionClass = 'border-gray-200 bg-white';
+                                if (oIndex === question.correct) {
+                                    optionClass = 'border-green-500 bg-green-100';
+                                } else if (oIndex === userAnswer && userAnswer !== question.correct) {
+                                    optionClass = 'border-red-500 bg-red-100';
+                                }
+                                return `
+                                    <div class="border-2 ${optionClass} rounded-lg p-3">
+                                        <span class="font-medium">${String.fromCharCode(65 + oIndex)}) ${option}</span>
+                                        ${oIndex === question.correct ? ' <span class="text-green-600 font-bold">(Correct)</span>' : ''}
+                                        ${oIndex === userAnswer && userAnswer !== question.correct ? ' <span class="text-red-600 font-bold">(Your Answer)</span>' : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            reviewHTML += '</div>';
+            quizContent.innerHTML = reviewHTML;
+            
+            // Hide navigation, show close button
+            document.getElementById('prevQuestionBtn').style.display = 'none';
+            document.getElementById('nextQuestionBtn').style.display = 'none';
+            document.getElementById('finishQuizBtn').style.display = 'none';
+        }
+
+        function closeTakeQuiz() {
+            document.getElementById('takeQuizModal').style.display = 'none';
+            if (quizTimer) {
+                clearInterval(quizTimer);
+            }
+        }
+
+        function closeQuizResults() {
+            document.getElementById('quizResultsModal').style.display = 'none';
+        }
+
+        // Update displays
+        function updateFeaturedContent() {
+            // Update featured posts
+            const featuredPosts = document.getElementById('featuredPosts');
+            if (posts.length === 0) {
+                featuredPosts.innerHTML = '<p class="text-gray-500 italic">No posts yet. Create your first post in the Admin section!</p>';
+            } else {
+                featuredPosts.innerHTML = posts.slice(0, 3).map(post => `
+                    <div class="border-l-4 border-blue-500 pl-4 py-2">
+                        <h4 class="font-medium text-gray-800">${post.title}</h4>
+                        <p class="text-sm text-gray-600">${post.category} • ${post.date}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Update featured quizzes
+            const featuredQuizzes = document.getElementById('featuredQuizzes');
+            if (quizzes.length === 0) {
+                featuredQuizzes.innerHTML = '<p class="text-gray-500 italic">No quizzes yet. Create your first quiz in the Admin section!</p>';
+            } else {
+                featuredQuizzes.innerHTML = quizzes.slice(0, 3).map(quiz => `
+                    <div class="border-l-4 border-green-500 pl-4 py-2">
+                        <h4 class="font-medium text-gray-800">${quiz.title}</h4>
+                        <p class="text-sm text-gray-600">${quiz.category} • ${quiz.questions.length} questions</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updatePostsList() {
+            const postsList = document.getElementById('postsList');
+            if (posts.length === 0) {
+                postsList.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-gray-500 text-lg">No posts available yet.</p>
+                        <p class="text-gray-400">Check back soon for new content!</p>
+                    </div>
+                `;
+            } else {
+                postsList.innerHTML = posts.map(post => `
+                    <article class="bg-white rounded-xl shadow-lg p-6 fade-in">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">${post.category}</span>
+                            <span class="text-gray-500 text-sm">${post.date}</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">${post.title}</h2>
+                        <div class="text-gray-600 mb-4 leading-relaxed">${post.content.replace(/\n/g, '<br>')}</div>
+                        ${post.tags.length > 0 ? `
+                            <div class="flex flex-wrap gap-2">
+                                ${post.tags.map(tag => `<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">#${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </article>
+                `).join('');
+            }
+        }
+
+        function updateQuizzesList() {
+            const quizzesList = document.getElementById('quizzesList');
+            if (quizzes.length === 0) {
+                quizzesList.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-gray-500 text-lg">No quizzes available yet.</p>
+                        <p class="text-gray-400">Check back soon for new quizzes!</p>
+                    </div>
+                `;
+            } else {
+                quizzesList.innerHTML = quizzes.map(quiz => `
+                    <div class="bg-white rounded-xl shadow-lg p-6 fade-in">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">${quiz.category}</span>
+                            <span class="text-gray-500 text-sm">${quiz.questions.length} questions</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3">${quiz.title}</h3>
+                        <p class="text-gray-600 mb-4">${quiz.description}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500 text-sm">Created: ${quiz.date}</span>
+                            <button onclick="startQuiz(${quiz.id})" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                🚀 Start Quiz
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateAdminLists() {
+            // Update admin posts list
+            const adminPostsList = document.getElementById('adminPostsList');
+            if (posts.length === 0) {
+                adminPostsList.innerHTML = '<p class="text-gray-500 italic">No posts created yet. Click "Create New Post" to get started!</p>';
+            } else {
+                adminPostsList.innerHTML = posts.map(post => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${post.title}</h4>
+                            <p class="text-sm text-gray-600">${post.category} • ${post.timestamp}</p>
+                        </div>
+                        <button onclick="deletePost(${post.id})" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                    </div>
+                `).join('');
+            }
+
+            // Update admin quizzes list
+            const adminQuizzesList = document.getElementById('adminQuizzesList');
+            if (quizzes.length === 0) {
+                adminQuizzesList.innerHTML = '<p class="text-gray-500 italic">No quizzes created yet. Click "Create New Quiz" to get started!</p>';
+            } else {
+                adminQuizzesList.innerHTML = quizzes.map(quiz => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${quiz.title}</h4>
+                            <p class="text-sm text-gray-600">${quiz.category} • ${quiz.questions.length} questions • ${quiz.timestamp}</p>
+                        </div>
+                        <button onclick="deleteQuiz(${quiz.id})" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                    </div>
+                `).join('');
+            }
+            
+            // Update moderators list
+            updateModeratorsList();
+        }
+
+        function updateModeratorsList() {
+            const moderatorsList = document.getElementById('moderatorsList');
+            if (moderators.length === 0) {
+                moderatorsList.innerHTML = '<p class="text-gray-500 italic">No moderators added yet. Click "Add Moderator" to get started!</p>';
+            } else {
+                moderatorsList.innerHTML = moderators.map(mod => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${mod.name}</h4>
+                            <p class="text-sm text-gray-600">${mod.email}</p>
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                ${mod.permissions?.canManagePosts ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Posts</span>' : ''}
+                                ${mod.permissions?.canManageQuizzes ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Quizzes</span>' : ''}
+                                ${mod.permissions?.canCustomize ? '<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Customize</span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Added: ${new Date(mod.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <button onclick="removeModerator(${mod.id})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} fade-in`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    if (quizTimer) {
+                        clearInterval(quizTimer);
+                    }
+                }
+            });
+        }
+
+        // Initialize website on load
+        initWebsite();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98940b60861fba50',t:'MTc1OTU3NDI1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
